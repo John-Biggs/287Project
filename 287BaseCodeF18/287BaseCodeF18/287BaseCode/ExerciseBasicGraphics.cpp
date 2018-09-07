@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 	glutMouseFunc(mouseUtility);
 
 	frameBuffer.setClearColor(black);
-	std::cout << directionInDegrees(glm::vec2(1, 0));
+	std::cout << map(2, 0, 5, 10, 11);
 
 	glutMainLoop();
 

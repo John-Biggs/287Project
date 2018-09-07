@@ -306,7 +306,7 @@ float areaOfTriangle(float a, float b, float c) {
 
 float directionInDegrees(float x1, float y1, float x2, float y2) {
 	// std::atan2(dy,dx) is dope
-	return normalizeDegrees(rad2deg(std::atan2(y2-y1,x2-x1)));
+	return normalizeDegrees(rad2deg(std::atan2(y2 - y1, x2 - x1)));
 }
 
 /**
@@ -335,7 +335,7 @@ float directionInDegrees(const glm::vec2 &pt1, const glm::vec2 &pt2) {
 */
 
 float directionInDegrees(const glm::vec2 &targetPt) {
-	return directionInDegrees(glm::vec2(0,0), targetPt);
+	return directionInDegrees(glm::vec2(0, 0), targetPt);
 }
 
 
@@ -458,7 +458,7 @@ glm::vec2 rotate90CCW(const glm::vec2 &pt) {
  */
 
 float map(float x, float xLow, float xHigh, float yLow, float yHigh) {
-	return 0.0f;
+	return ((x - xLow)*(yHigh - yLow) / ((xHigh - xLow))) + yLow;
 }
 
 /**
@@ -474,7 +474,7 @@ float map(float x, float xLow, float xHigh, float yLow, float yHigh) {
  */
 
 void map(float x, float xLow, float xHigh, float yLow, float yHigh, float &y) {
-	y = 0.0f;
+	y = map(x, xLow, xHigh, yLow, yHigh);
 }
 
 /**
@@ -491,8 +491,14 @@ void map(float x, float xLow, float xHigh, float yLow, float yHigh, float &y) {
 
 std::vector<float> quadratic(float A, float B, float C) {
 	std::vector<float> result;
-	result.push_back(-1);
-	result.push_back(0);
+	float disc = B * B - 4 * A * C;
+	if (disc > 0) {
+		result.push_back((-B - sqrt(disc)) / (2 * A));
+		result.push_back((-B + sqrt(disc)) / (2 * A));
+	}
+	else if (disc == 0) {
+		result.push_back(-B / (2 * A));
+	}
 	return result;
 }
 
@@ -509,9 +515,17 @@ std::vector<float> quadratic(float A, float B, float C) {
 */
 
 int quadratic(float A, float B, float C, float roots[2]) {
-	roots[0] = 0.0f;
-	roots[1] = 1.0f;
-	return 2;
+	float disc = B * B - 4 * A * C;
+	if (disc > 0) {
+		roots[0] = ((-B - sqrt(disc)) / (2 * A));
+		roots[1] = ((-B + sqrt(disc)) / (2 * A));
+		return 2;
+	}
+	else if (disc == 0) {
+		roots[0] = (-B / (2 * A));
+		return 1;
+	}
+	return 0;
 }
 
 /**
