@@ -83,7 +83,10 @@ int main(int argc, char *argv[]) {
 	glutMouseFunc(mouseUtility);
 
 	frameBuffer.setClearColor(black);
-	std::cout << map(2, 0, 5, 10, 11);
+	std::cout << map(34, 12, 72, -11, -10);
+	std::cout << quadratic(-2, 1, 3);
+	std::cout << quadratic(9, 6, 1);
+	std::cout << quadratic(10, -5, 1);
 
 	glutMainLoop();
 
