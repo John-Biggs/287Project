@@ -347,7 +347,7 @@ float directionInDegrees(const glm::vec2 &targetPt) {
 */
 
 glm::vec2 doubleIt(const glm::vec2 &V) {
-	return V;
+	return 2.0f * V;
 }
 
 /**
@@ -358,7 +358,7 @@ glm::vec2 doubleIt(const glm::vec2 &V) {
 */
 
 glm::vec3 myNormalize(const glm::vec3 &V) {
-	return V;
+	return V / glm::length(V);
 }
 
 /**
