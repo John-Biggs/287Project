@@ -100,8 +100,19 @@ void VisibleIShape::setTexture(Image *tex) {
 
 HitRecord VisibleIShape::findIntersection(const Ray &ray, const std::vector<VisibleIShapePtr> &surfaces) {
 	HitRecord theHit;
+	theHit.t = FLT_MAX;
+
+	for (int i = 0; i < surfaces.size(); i++) {
+		HitRecord thisHit;
+		surfaces[i]->findClosestIntersection(ray, thisHit);
+		if (thisHit.t < theHit.t && thisHit.t > 0) {
+			theHit = thisHit;
+			theHit.material = surfaces[i]->material;
+		}
+	}
 	return theHit;
 }
+
 
 /**
  * @fn	IDisk::IDisk(const glm::vec3 &pos, const glm::vec3 &normal, float rad)
@@ -356,10 +367,25 @@ QuadricParameters QuadricParameters::ellipsoidQParams(const glm::vec3 &sz) {
  * @param [in,out]	hit	The hit.
  */
 
-void IPlane::findClosestIntersection(const Ray &ray, HitRecord &hit) const {
-	hit.t = 1.0f;
-	hit.surfaceNormal = glm::vec3();
+void IPlane::findClosestIntersection(const Ray &ray, HitRecord &hit) const {	// slide 4.26
+	float denom = glm::dot(ray.direction, n);
+
+	if (denom == 0) {
+		hit.t = FLT_MAX;
+	}
+	else {
+		float num = glm::dot(a - ray.origin, n);
+		hit.t = num / denom;
+		if (hit.t < 0) {
+			hit.t = FLT_MAX;
+		}
+		else {
+			hit.interceptPoint = ray.getPoint(hit.t);
+			hit.surfaceNormal = n;
+		}
+	}
 }
+
 
 /**
  * @fn	IPlane::IPlane(const glm::vec3 &point, const glm::vec3 &normal)

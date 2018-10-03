@@ -20,10 +20,14 @@ RaytracingCamera::RaytracingCamera(const glm::vec3 &viewingPos, const glm::vec3 
  * @param	up		  	Up vector.
  */
 
-void RaytracingCamera::changeConfiguration(const glm::vec3 &viewingPos, const glm::vec3 &lookAtPt, const glm::vec3 &up) {
-	glm::vec3 u, v, w;
+void RaytracingCamera::changeConfiguration(const glm::vec3 &viewingPos, const glm::vec3 &lookAtPt, const glm::vec3 &up) { 		// slide 4.15
+	glm::vec3 viewingDirection = lookAtPt - viewingPos;
+	glm::vec3 w = glm::normalize(-viewingDirection);
+	glm::vec3 u = glm::normalize(glm::cross(up, w));
+	glm::vec3 v = glm::normalize(glm::cross(w, u));
 	cameraFrame.setFrame(viewingPos, u, v, w);
 }
+
 
 /**
  * @fn	PerspectiveCamera::PerspectiveCamera(const glm::vec3 &pos, const glm::vec3 &lookAtPt, const glm::vec3 &up, float FOVRads)
@@ -61,10 +65,12 @@ OrthographicCamera::OrthographicCamera(const glm::vec3 &pos, const glm::vec3 &lo
  * @return	Projection plane coordinates.
  */
 
-glm::vec2 RaytracingCamera::getProjectionPlaneCoordinates(float x, float y) const {
-	glm::vec2 s;
-	return s;
+glm::vec2 RaytracingCamera::getProjectionPlaneCoordinates(float x, float y) const {	// slide 4.19
+	float u = left + (right - left) * (x + 0.5f) / nx;
+	float v = bottom + (top - bottom) * (y + 0.5f) / ny;
+	return glm::vec2(u, v);
 }
+
 
 /**
  * @fn	void PerspectiveCamera::calculateViewingParameters(int W, int H)
@@ -73,9 +79,16 @@ glm::vec2 RaytracingCamera::getProjectionPlaneCoordinates(float x, float y) cons
  * @param	H	The height of window.
  */
 
-void PerspectiveCamera::calculateViewingParameters(int W, int H) {
-	// fill in nx, ny, distToPlane, top, bottom, left, and right
+void PerspectiveCamera::calculateViewingParameters(int W, int H) {	// slide 4.14
+	nx = (float)W;
+	ny = (float)H;
+	distToPlane = 1.0f / std::tan(fov / 2.0f);
+	top = 1.0f;
+	bottom = -top;
+	right = top * (nx / ny);
+	left = -right;
 }
+
 
 /**
  * @fn	void OrthographicCamera::calculateViewingParameters(int W, int H)
@@ -109,13 +122,12 @@ Ray OrthographicCamera::getRay(float x, float y) const {
  * @return	The ray eminating from camera through the projection plane at (x, y).
  */
 
-Ray PerspectiveCamera::getRay(float x, float y) const {
+Ray PerspectiveCamera::getRay(float x, float y) const {	// slide 4.18
 	glm::vec2 uv = getProjectionPlaneCoordinates(x, y);
-	glm::vec3 rayDirection = glm::normalize((float)(-distToPlane) * cameraFrame.w +
-																	uv.x * cameraFrame.u + 
-																	uv.y * cameraFrame.v); // Page 76
+	glm::vec3 rayDirection = glm::normalize((float)(-distToPlane) * cameraFrame.w + uv.x * cameraFrame.u + uv.y * cameraFrame.v);
 	return Ray(cameraFrame.origin, rayDirection);
 }
+
 
 /**
  * @fn	void PerspectiveCamera::setFOV(float FOV, int W, int H)

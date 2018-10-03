@@ -370,7 +370,7 @@ glm::vec3 myNormalize(const glm::vec3 &V) {
 */
 
 bool isOrthogonal(const glm::vec3 &a, const glm::vec3 &b) {
-	return false;
+	return approximatelyEqual(0,glm::dot(a,b));
 }
 
 /**
