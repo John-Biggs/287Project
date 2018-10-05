@@ -84,6 +84,7 @@ void mouse(int button, int state, int x, int y) {
 }
 
 int main(int argc, char *argv[]) {
+	std::cout << quadratic(1, 0, 0);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);

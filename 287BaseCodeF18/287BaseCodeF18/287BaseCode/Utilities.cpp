@@ -492,11 +492,11 @@ void map(float x, float xLow, float xHigh, float yLow, float yHigh, float &y) {
 std::vector<float> quadratic(float A, float B, float C) {
 	std::vector<float> result;
 	float disc = B * B - 4 * A * C;
-	if (disc > 0) {
+	if (!approximatelyEqual(0,disc) && disc > 0) {
 		result.push_back((-B - sqrt(disc)) / (2 * A));
 		result.push_back((-B + sqrt(disc)) / (2 * A));
 	}
-	else if (disc == 0) {
+	else if (approximatelyEqual(0, disc)) {
 		result.push_back(-B / (2 * A));
 	}
 	return result;
@@ -516,12 +516,12 @@ std::vector<float> quadratic(float A, float B, float C) {
 
 int quadratic(float A, float B, float C, float roots[2]) {
 	float disc = B * B - 4 * A * C;
-	if (disc > 0) {
+	if (!approximatelyEqual(0, disc) && disc > 0) {
 		roots[0] = ((-B - sqrt(disc)) / (2 * A));
 		roots[1] = ((-B + sqrt(disc)) / (2 * A));
 		return 2;
-	}
-	else if (disc == 0) {
+	} 
+	else if (approximatelyEqual(0, disc)) {
 		roots[0] = (-B / (2 * A));
 		return 1;
 	}
@@ -602,7 +602,7 @@ glm::vec3 pointingVector(const glm::vec3 &pt1, const glm::vec3 &pt2) {
 */
 
 glm::vec3 normalFrom3Points(const glm::vec3 &pt0, const glm::vec3 &pt1, const glm::vec3 &pt2) {
-	return glm::vec3();
+	return glm::normalize(glm::cross(pt1-pt0,pt2-pt0));
 }
 
 /**
@@ -613,7 +613,7 @@ glm::vec3 normalFrom3Points(const glm::vec3 &pt0, const glm::vec3 &pt1, const gl
 */
 
 glm::vec3 normalFrom3Points(const std::vector<glm::vec3> pts) {
-	return glm::vec3();
+	return normalFrom3Points(pts[0],pts[1],pts[2]);
 }
 
 /**

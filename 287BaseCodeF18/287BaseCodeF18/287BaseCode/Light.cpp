@@ -9,7 +9,7 @@
   */
 
 color ambientColor(const color &mat, const color &light) {
-	return mat;
+	return glm::clamp((mat * light), 0.0f, 1.0f);
 }
 
 /**
@@ -23,8 +23,8 @@ color ambientColor(const color &mat, const color &light) {
  */
 
 color diffuseColor(const color &mat, const color &light,
-					const glm::vec3 &l, const glm::vec3 &n) {
-	return mat;
+	const glm::vec3 &l, const glm::vec3 &n) {
+	return glm::clamp((mat * light)*glm::dot(l, n), 0.0f, 1.0f);
 }
 
 /**
@@ -39,9 +39,10 @@ color diffuseColor(const color &mat, const color &light,
  */
 
 color specularColor(const color &mat, const color &light,
-					float shininess,
-					const glm::vec3 &r, const glm::vec3 &v) {
-	return mat;
+	float shininess,
+	const glm::vec3 &r, const glm::vec3 &v) {
+	return glm::clamp((mat * light)*pow(glm::dot(r, v), shininess), 0.0f, 1.0f);
+	;
 }
 
 /**
@@ -57,16 +58,29 @@ color specularColor(const color &mat, const color &light,
  * @param	ATparams	  	Attenuation parameters.
  * @return	Color produced by a single light at a single point.
  */
- 
+
 color totalColor(const Material &mat, const LightColor &lightColor,
-				const glm::vec3 &v, const glm::vec3 &n,
-				const glm::vec3 &lightPos, const glm::vec3 &intersectionPt,
-				bool attenuationOn, 
-				const LightAttenuationParameters &ATparams) {
+	const glm::vec3 &v, const glm::vec3 &n,
+	const glm::vec3 &lightPos, const glm::vec3 &intersectionPt,
+	bool attenuationOn,
+	const LightAttenuationParameters &ATparams) {
 	if (DEBUG_PIXEL) {
 		std::cout << std::endl;
 	}
-	return mat.ambient + mat.diffuse;
+	float distance = glm::length(lightPos - intersectionPt);
+	float attFactor = 1 / (ATparams.constant + ATparams.linear * distance + ATparams.quadratic * distance*distance);
+	glm::vec3 l = glm::normalize(lightPos - intersectionPt);
+	glm::vec3 r = 2 * glm::dot(l, n) * n - l;
+	if (attenuationOn) {
+		return glm::clamp(ambientColor(mat.ambient, lightColor.ambient) +
+			attFactor * diffuseColor(mat.diffuse, lightColor.diffuse, lightPos - intersectionPt, n) +
+			attFactor * specularColor(mat.specular, lightColor.specular, mat.shininess, r, v), 0.0f, 1.0f);
+	}
+	else {
+		return glm::clamp(ambientColor(mat.ambient, lightColor.ambient) +
+			diffuseColor(mat.diffuse, lightColor.diffuse, lightPos - intersectionPt, n) +
+			specularColor(mat.specular, lightColor.specular, mat.shininess, r, v), 0.0f, 1.0f);
+	}
 }
 
 /**
@@ -80,10 +94,12 @@ color totalColor(const Material &mat, const LightColor &lightColor,
  */
 
 color PositionalLight::illuminate(const glm::vec3 &interceptWorldCoords,
-									const glm::vec3 &normal,
-									const Material &material,
-									const Frame &eyeFrame, bool inShadow) const {
+	const glm::vec3 &normal,
+	const Material &material,
+	const Frame &eyeFrame, bool inShadow) const {
 	if (!isOn) return black;
+	//yo if it's in shadow return ambient
+	if (inShadow) return material.ambient;
 	return material.ambient;
 }
 
@@ -98,9 +114,9 @@ color PositionalLight::illuminate(const glm::vec3 &interceptWorldCoords,
  */
 
 color SpotLight::illuminate(const glm::vec3 &interceptWorldCoords,
-							const glm::vec3 &normal,
-							const Material &material,
-							const Frame &eyeFrame, bool inShadow) const {
+	const glm::vec3 &normal,
+	const Material &material,
+	const Frame &eyeFrame, bool inShadow) const {
 	if (!isOn) return black;
 	return material.ambient;
 }
@@ -128,7 +144,7 @@ std::ostream &operator << (std::ostream &os, const LightAttenuationParameters &a
 
 std::ostream &operator << (std::ostream &os, const PositionalLight &pl) {
 	os << (pl.isOn ? "ON" : "OFF") << std::endl;
-	os << (pl.isTiedToWorld? "WORLD" : "CAMERA") << std::endl;
+	os << (pl.isTiedToWorld ? "WORLD" : "CAMERA") << std::endl;
 	os << " position " << pl.lightPosition << std::endl;
 	os << " ambient " << pl.lightColorComponents.ambient << std::endl;
 	os << " diffuse " << pl.lightColorComponents.diffuse << std::endl;
