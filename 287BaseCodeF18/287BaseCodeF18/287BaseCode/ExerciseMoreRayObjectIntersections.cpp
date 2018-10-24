@@ -49,12 +49,12 @@ void resize(int width, int height) {
 }
 
 void buildScene() {
-	IShape *bronzeDisk = new IDisk(glm::vec3(-6, 0, -5), glm::vec3(0,0,1), 3);
+	IShape *bronzeDisk = new IDisk(glm::vec3(4, 0, -1), glm::vec3(0,0,1), 1);
 	IShape *tinDisk = new IDisk(glm::vec3(-8, 0, -4), glm::vec3(0, 0, 1), 3);
 	ICylinderY *cylinder = new ICylinderY(glm::vec3(4.0f, 0.0f, -1.0f), 5.0f, 3.0f);
 
 	scene.addObject(new VisibleIShape(bronzeDisk, bronze));
-	scene.addObject(new VisibleIShape(tinDisk, tin));
+	//scene.addObject(new VisibleIShape(tinDisk, tin));
 	scene.addObject(new VisibleIShape(cylinder, gold));
 
 	scene.addObject(lights[0]);
