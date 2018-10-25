@@ -17,6 +17,7 @@ bool isAnimated = false;
 int numReflections = 0;
 int antiAliasing = 1;
 bool twoViewOn = false;
+Image im("usflag.ppm");
 
 std::vector<PositionalLightPtr> lights = {
 						new PositionalLight(glm::vec3(10, 10, 10), pureWhiteLight),
@@ -27,7 +28,7 @@ PositionalLightPtr posLight = lights[0];
 SpotLightPtr spotLight = (SpotLightPtr)lights[1];
 
 FrameBuffer frameBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
-RayTracer rayTrace(lightGray);
+RayTracer rayTrace(black);
 PerspectiveCamera pCamera(glm::vec3(0, 10, 10), ORIGIN3D, Y_AXIS, M_PI_2);
 OrthographicCamera oCamera(glm::vec3(0, 10, 10), ORIGIN3D, Y_AXIS, 25.0f);
 RaytracingCamera *cameras[] = { &pCamera, &oCamera };
@@ -38,7 +39,7 @@ void render() {
 	int frameStartTime = glutGet(GLUT_ELAPSED_TIME);
 	cameras[currCamera]->calculateViewingParameters(frameBuffer.getWindowWidth()/2, frameBuffer.getWindowHeight());
 	cameras[currCamera]->changeConfiguration(glm::vec3(0, 15, 15), ORIGIN3D, Y_AXIS);
-	rayTrace.raytraceScene(frameBuffer, numReflections, scene);
+	rayTrace.raytraceScene(frameBuffer, numReflections, scene, antiAliasing);
 
 	int frameEndTime = glutGet(GLUT_ELAPSED_TIME); // Get end time
 	float totalTimeSec = (frameEndTime - frameStartTime) / 1000.0f;
@@ -54,12 +55,18 @@ void resize(int width, int height) {
 ISphere *sphere = new ISphere(glm::vec3(-4.0f, 0.0f, 0.0f), 2.0f);
 IShape *plane = new IPlane(glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 IEllipsoid *ellipsoid = new IEllipsoid(glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(2.0f, 1.0f, 2.0f));
+IClosedCylinderY *closedCylinder = new IClosedCylinderY(glm::vec3(8.0f, 0.0f, 0.0f), 2.0f, 4.0f);
+IConeX *cone = new IConeX(glm::vec3(14.0f, 0.0f, 8.0f), 1.0f, 3.0f);
 
 void buildScene() {
-	scene.addObject(new VisibleIShape(plane, tin));
+	VisibleIShapePtr p = new VisibleIShape(closedCylinder, redPlastic);
+	p->setTexture(&im);
 
+	scene.addObject(new VisibleIShape(plane, tin));
+	scene.addObject(p);
 	scene.addObject(new VisibleIShape(sphere, silver));
 	scene.addObject(new VisibleIShape(ellipsoid, redPlastic));
+	scene.addObject(new VisibleIShape(cone, redPlastic));
 
 	scene.addObject(lights[0]);
 	scene.addObject(lights[1]);

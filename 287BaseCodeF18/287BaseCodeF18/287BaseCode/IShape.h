@@ -133,6 +133,7 @@ struct QuadricParameters {
 	static QuadricParameters cylinderZQParams(float R);
 	static QuadricParameters sphereQParams(float R);
 	static QuadricParameters ellipsoidQParams(const glm::vec3 &sz);
+	static QuadricParameters coneXQParams(float R);
 };
 
 /**
@@ -198,6 +199,18 @@ struct ISphere : IQuadricSurface {
 	virtual void computeAqBqCq(const Ray &ray, float &Aq, float &Bq, float &Cq) const;
 };
 
+struct ICone : public IQuadricSurface {
+	float radius, length;
+	ICone(const glm::vec3 &position, float R, float len, const QuadricParameters &qParams);
+	virtual void findClosestIntersection(const Ray &ray, HitRecord &hit) const = 0;
+	virtual void computeAqBqCq(const Ray &ray, float &Aq, float &Bq, float &Cq) const;
+};
+
+struct IConeX : public ICone {
+	IConeX(const glm::vec3 &position, float R, float len);
+	virtual void findClosestIntersection(const Ray &ray, HitRecord &hit) const;
+};
+
 /**
  * @struct	ICylinder
  * @brief	Base class for implicit representation of a cylinder.
@@ -219,6 +232,22 @@ struct ICylinderY : public ICylinder {
 	ICylinderY(const glm::vec3 &position, float R, float len);
 	virtual void findClosestIntersection(const Ray &ray, HitRecord &hit) const;
 	void getTexCoords(const glm::vec3 &pt, float &u, float &v) const;
+};
+
+struct ICylinderX : public ICylinder {
+	ICylinderX(const glm::vec3 &position, float R, float len);
+	virtual void findClosestIntersection(const Ray &ray, HitRecord &hit) const;
+};
+
+/**
+ * @struct	ICylinderY
+ * @brief	Implicit representation of open cylinder oriented along y-axis coordinate.
+ */
+
+struct IClosedCylinderY : public ICylinderY {
+	IClosedCylinderY(const glm::vec3 &position, float R, float len);
+	IDisk top, bottom;
+	virtual void findClosestIntersection(const Ray &ray, HitRecord &hit) const;
 };
 
 /**
