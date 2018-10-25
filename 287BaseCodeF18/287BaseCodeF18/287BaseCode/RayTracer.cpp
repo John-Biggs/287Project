@@ -54,17 +54,23 @@ void RayTracer::raytraceScene(FrameBuffer &frameBuffer, int depth,
 
 color RayTracer::traceIndividualRay(const Ray &ray, const IScene &theScene, int recursionLevel) const {
 	HitRecord theHit = VisibleIShape::findIntersection(ray, theScene.visibleObjects);
+	HitRecord transparentHit = VisibleIShape::findIntersection(ray, theScene.transparentObjects);
 	color result = defaultColor;
 	if (glm::dot(theHit.surfaceNormal, ray.direction) > 0) {
 		theHit.surfaceNormal = -theHit.surfaceNormal;
 	}
+
 	if (theHit.t < FLT_MAX) {
 		for (int i = 0; i < theScene.lights.size(); i++) {
 			Ray shadow = Ray(theHit.interceptPoint + EPSILON * theHit.surfaceNormal, theScene.lights[i]->lightPosition - theHit.interceptPoint);
 			HitRecord shadowHit = VisibleIShape::findIntersection(shadow, theScene.visibleObjects);
 			bool inShadow = shadowHit.t < theHit.t;
 			color c = theScene.lights[i]->illuminate(theHit.interceptPoint, theHit.surfaceNormal, theHit.material, theScene.camera->cameraFrame, inShadow);
-
+			if (transparentHit.t < theHit.t) {
+				color s = theScene.lights[i]->illuminate(transparentHit.interceptPoint, transparentHit.surfaceNormal, transparentHit.material, theScene.camera->cameraFrame, inShadow);
+				result += transparentHit.material.alpha * s;
+				c *= 1 - transparentHit.material.alpha;
+			}
 			if (theHit.texture != nullptr) {
 				float u = glm::clamp(theHit.u, 0.0f, 1.0f);
 				float v = glm::clamp(theHit.v, 0.0f, 1.0f);
@@ -76,6 +82,18 @@ color RayTracer::traceIndividualRay(const Ray &ray, const IScene &theScene, int 
 			}
 		}
 	}
+	else if (transparentHit.t < FLT_MAX) {
+		for (int i = 0; i < theScene.lights.size(); i++) {
+			Ray shadow = Ray(theHit.interceptPoint + EPSILON * theHit.surfaceNormal, theScene.lights[i]->lightPosition - theHit.interceptPoint);
+			HitRecord shadowHit = VisibleIShape::findIntersection(shadow, theScene.visibleObjects);
+			bool inShadow = shadowHit.t < theHit.t;
+			color s = theScene.lights[i]->illuminate(transparentHit.interceptPoint, transparentHit.surfaceNormal, transparentHit.material, theScene.camera->cameraFrame, inShadow);
+			result += transparentHit.material.alpha * s;
+			result += defaultColor * (1 - transparentHit.material.alpha);
+		}
+
+	}
+	if (result != defaultColor) result -= defaultColor;
 	if (recursionLevel == 0) {
 		return result;
 	}
