@@ -56,9 +56,9 @@ ISphere *sphere = new ISphere(glm::vec3(-4.0f, 0.0f, 0.0f), 2.0f);
 IShape *plane = new IPlane(glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 IEllipsoid *ellipsoid = new IEllipsoid(glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(2.0f, 1.0f, 2.0f));
 IClosedCylinderY *closedCylinder = new IClosedCylinderY(glm::vec3(8.0f, 0.0f, 0.0f), 2.0f, 4.0f);
-IConeX *cone = new IConeX(glm::vec3(15.0f, 1.0f, 5.0f), 1.0f, 3.0f);
+IConeX *cone = new IConeX(glm::vec3(-8.0f, 1.0f, 5.0f), 1.0f, 3.0f);
 IPlane *transPlane = new IPlane(glm::vec3(10.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-ICylinderX *xCylinder = new ICylinderX(glm::vec3(30.0f, 0.0f, 0.0f), 2.0f, 4.0f);
+ICylinderX *xCylinder = new ICylinderX(glm::vec3(20.0f, 0.0f, 0.0f), 2.0f, 4.0f);
 
 void buildScene() {
 	VisibleIShapePtr p = new VisibleIShape(closedCylinder, tin);
