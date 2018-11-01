@@ -625,7 +625,7 @@ glm::vec3 normalFrom3Points(const std::vector<glm::vec3> pts) {
 */
 
 glm::vec3 getRow(const glm::mat3 &mat, int row) {
-	return glm::vec3();
+	return glm::vec3(mat[0][row], mat[1][row], mat[2][row]);
 }
 
 /**
@@ -637,7 +637,7 @@ glm::vec3 getRow(const glm::mat3 &mat, int row) {
  */
 
 glm::vec3 getCol(const glm::mat3 &mat, int col) {
-	return glm::vec3();
+	return glm::vec3(mat[col][0], mat[col][1], mat[col][2]);
 }
 
 /**
@@ -648,7 +648,7 @@ glm::vec3 getCol(const glm::mat3 &mat, int col) {
 */
 
 bool isInvertible(const glm::mat2 &mat) {
-	return false;
+	return glm::determinant(mat) != 0;
 }
 
 /**
@@ -659,7 +659,7 @@ bool isInvertible(const glm::mat2 &mat) {
  */
 
 bool isInvertible(const glm::mat3 &mat) {
-	return false;
+	return glm::determinant(mat) != 0;
 }
 
 /**
@@ -683,7 +683,10 @@ glm::vec3 solveLinearSystem(const glm::mat3 &M, const glm::vec3 &y) {
  */
 
 glm::mat3 addMatrices(const std::vector<glm::mat3> &M) {
-	glm::mat3 result;
+	glm::mat3 result(0,0,0,0,0,0,0,0,0);
+	for (int i = 0; i < M.size(); i++) {
+		result += M[i];
+	}
 	return result;
 }
 
@@ -695,7 +698,10 @@ glm::mat3 addMatrices(const std::vector<glm::mat3> &M) {
  */
 
 glm::mat3 multiplyMatrices(const std::vector<glm::mat3> &M) {
-	glm::mat3 result;
+	glm::mat3 result = M[0];
+	for (int i = 1; i < M.size(); i++) {
+		result *= M[i];
+	}
 	return result;
 }
 
