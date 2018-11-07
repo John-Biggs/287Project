@@ -1,3 +1,4 @@
+#define GLM_FORCE_CTOR_INIT
 #include <ctime> 
 #include <iostream>
 #include <vector>
@@ -26,11 +27,13 @@ EShapeData cyl1 = EShape::createECylinder(silver, 0.5, 1, 20);
 EShapeData cyl2 = EShape::createECylinder(silver, 0.5, 1, 20);
 
 void renderObjects() {
-	VertexOps::render(frameBuffer, plane, lights, glm::mat4());
-	VertexOps::render(frameBuffer, cone1, lights, T(-1, 2, 0)*S(0.25f)*Rx(angle));
-	VertexOps::render(frameBuffer, cone2, lights, Ry(angle)*T(2, 1, 0)*Rx(angle));
-	VertexOps::render(frameBuffer, cyl1, lights, T(2,1,0));
-	VertexOps::render(frameBuffer, cyl2, lights, T(-2, 1, 0)*Rx(M_PI_2));
+	glm::mat4 I = glm::mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+	glm::mat4 A;
+	VertexOps::render(frameBuffer, plane, lights, I);
+	//VertexOps::render(frameBuffer, cone1, lights, T(-1, 2, 0)*S(0.25f)*Rx(angle));
+	//VertexOps::render(frameBuffer, cone2, lights, Ry(angle)*T(2, 1, 0)*Rx(angle));
+	//VertexOps::render(frameBuffer, cyl1, lights, T(2,1,0));
+	//VertexOps::render(frameBuffer, cyl2, lights, T(-2, 1, 0)*Rx(M_PI_2));
 }
 
 static void render() {

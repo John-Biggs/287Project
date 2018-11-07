@@ -57,6 +57,23 @@ EShapeData EShape::createECylinder(const Material &mat, float R, float height, i
 
 EShapeData EShape::createECone(const Material &mat, float R, float height, int slices, int stacks) {
 	EShapeData result;
+	float angle = M_2PI / slices;
+	glm::vec4 top(0, height, 0, 1);
+	for (int i = 0; i < slices; i++) {
+		float x1 = R*glm::cos(i*angle);
+		float z1 = R * glm::sin(i*angle);
+		float x2 = R * glm::cos((i+1)*angle);
+		float z2 = R * glm::sin((i+1)*angle);
+		glm::vec4 V1(x1, 0, z1, 1);
+		glm::vec4 V2(x2, 0, z2, 1);
+		glm::vec3 N = normalFrom3Points(V1.xyz, V2.xyz, top.xyz);
+		VertexData vert1(V1,N,mat);
+		VertexData vert2(V2,N,mat);
+		VertexData vert3(top,N,mat);
+		result.push_back(vert1);
+		result.push_back(vert2);
+		result.push_back(vert3);
+	}
 	return result;
 }
 

@@ -672,7 +672,7 @@ bool isInvertible(const glm::mat3 &mat) {
 
 glm::vec3 solveLinearSystem(const glm::mat3 &M, const glm::vec3 &y) {
 	glm::vec3 result;
-	if (isInvertible(M)) {
+	if (!isInvertible(M)) {
 		result = glm::vec3(0, 0, 0);
 		return result;
 	}
@@ -870,7 +870,7 @@ glm::mat3 rotateAroundOwnAxisAndAroundOrigin(
 */
 
 glm::mat4 T(float dx, float dy, float dz) {
-	return glm::mat4();
+	return glm::translate(glm::vec3(dx, dy, dz));
 }
 
 /**
@@ -883,7 +883,7 @@ glm::mat4 T(float dx, float dy, float dz) {
 */
 
 glm::mat4 S(float sx, float sy, float sz) {
-	return glm::mat4();
+	return glm::scale(glm::vec3(sx, sy, sz));
 }
 
 /**
@@ -894,7 +894,7 @@ glm::mat4 S(float sx, float sy, float sz) {
 */
 
 glm::mat4 S(float scale) {
-	return glm::mat4();
+	return glm::scale(glm::vec3(scale, scale, scale));
 }
 
 /**
@@ -905,7 +905,7 @@ glm::mat4 S(float scale) {
 */
 
 glm::mat4 Rx(float rads) {
-	return glm::mat4();
+	return glm::rotate(rads, glm::vec3(1, 0, 0));
 }
 
 /**
@@ -916,7 +916,7 @@ glm::mat4 Rx(float rads) {
 */
 
 glm::mat4 Ry(float rads) {
-	return glm::mat4();
+	return glm::rotate(rads, glm::vec3(0, 1, 0));
 }
 
 /**
@@ -927,7 +927,7 @@ glm::mat4 Ry(float rads) {
 */
 
 glm::mat4 Rz(float rads) {
-	return glm::mat4();
+	return glm::rotate(rads, glm::vec3(0, 0, 1));
 }
 
 /**
