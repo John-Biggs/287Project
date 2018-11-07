@@ -370,7 +370,7 @@ glm::vec3 myNormalize(const glm::vec3 &V) {
 */
 
 bool isOrthogonal(const glm::vec3 &a, const glm::vec3 &b) {
-	return approximatelyEqual(0,glm::dot(a,b));
+	return approximatelyEqual(0, glm::dot(a, b));
 }
 
 /**
@@ -492,7 +492,7 @@ void map(float x, float xLow, float xHigh, float yLow, float yHigh, float &y) {
 std::vector<float> quadratic(float A, float B, float C) {
 	std::vector<float> result;
 	float disc = B * B - 4 * A * C;
-	if (!approximatelyEqual(0,disc) && disc > 0) {
+	if (!approximatelyEqual(0, disc) && disc > 0) {
 		result.push_back((-B - sqrt(disc)) / (2 * A));
 		result.push_back((-B + sqrt(disc)) / (2 * A));
 	}
@@ -520,7 +520,7 @@ int quadratic(float A, float B, float C, float roots[2]) {
 		roots[0] = ((-B - sqrt(disc)) / (2 * A));
 		roots[1] = ((-B + sqrt(disc)) / (2 * A));
 		return 2;
-	} 
+	}
 	else if (approximatelyEqual(0, disc)) {
 		roots[0] = (-B / (2 * A));
 		return 1;
@@ -602,7 +602,7 @@ glm::vec3 pointingVector(const glm::vec3 &pt1, const glm::vec3 &pt2) {
 */
 
 glm::vec3 normalFrom3Points(const glm::vec3 &pt0, const glm::vec3 &pt1, const glm::vec3 &pt2) {
-	return glm::normalize(glm::cross(pt1-pt0,pt2-pt0));
+	return glm::normalize(glm::cross(pt1 - pt0, pt2 - pt0));
 }
 
 /**
@@ -613,7 +613,7 @@ glm::vec3 normalFrom3Points(const glm::vec3 &pt0, const glm::vec3 &pt1, const gl
 */
 
 glm::vec3 normalFrom3Points(const std::vector<glm::vec3> pts) {
-	return normalFrom3Points(pts[0],pts[1],pts[2]);
+	return normalFrom3Points(pts[0], pts[1], pts[2]);
 }
 
 /**
@@ -676,7 +676,7 @@ glm::vec3 solveLinearSystem(const glm::mat3 &M, const glm::vec3 &y) {
 		result = glm::vec3(0, 0, 0);
 		return result;
 	}
-	return multiplyMatrixAndVertex(glm::inverse(M),y);
+	return multiplyMatrixAndVertex(glm::inverse(M), y);
 }
 
 /**
@@ -718,7 +718,7 @@ glm::mat3 multiplyMatrices(const std::vector<glm::mat3> &M) {
  */
 
 glm::vec3 multiplyMatrixAndVertex(const glm::mat3 &M, const glm::vec3 &x) {
-	return M*x;
+	return M * x;
 }
 
 /**
@@ -758,7 +758,7 @@ std::vector<glm::vec3> multiplyMatrixAndVertices(const glm::mat3 &M, const std::
  */
 
 std::vector<glm::vec3> multiplyMatricesAndVertices(const std::vector<glm::mat3> &M, const std::vector<glm::vec3> &verts) {
-	return multiplyMatrixAndVertices(multiplyMatrices(M),verts);
+	return multiplyMatrixAndVertices(multiplyMatrices(M), verts);
 }
 
 glm::mat3 mystery(float a, float b) {
@@ -787,7 +787,7 @@ glm::mat2 myinverse(const glm::mat2 &M) {
 */
 
 glm::mat3 T(float dx, float dy) {
-	return glm::mat3();
+	return glm::mat3(1, 0, 0, 0, 1, 0, dx, dy, 1);
 }
 
 /**
@@ -799,7 +799,7 @@ glm::mat3 T(float dx, float dy) {
  */
 
 glm::mat3 S(float sx, float sy) {
-	return glm::mat3();
+	return glm::mat3(sx, 0, 0, 0, sy, 0, 0, 0, 1);
 }
 
 /**
@@ -810,7 +810,7 @@ glm::mat3 S(float sx, float sy) {
  */
 
 glm::mat3 R(float deg) {
-	return glm::mat3();
+	return glm::mat3(glm::cos(deg2rad(deg)), glm::sin(deg2rad(deg)), 0, -glm::sin(deg2rad(deg)), glm::cos(deg2rad(deg)), 0, 0, 0, 1);
 }
 
 /**
@@ -821,7 +821,7 @@ glm::mat3 R(float deg) {
  */
 
 glm::mat3 horzShear(float a) {
-	return glm::mat3();
+	return glm::mat3(1, 0, 0, a, 1, 0, 0, 0, 1);
 }
 
 /**
@@ -832,8 +832,33 @@ glm::mat3 horzShear(float a) {
  */
 
 glm::mat3 vertShear(float a) {
-	return glm::mat3();
+	return glm::mat3(1, a, 0, 0, 1, 0, 0, 0, 1);
 }
+
+glm::mat3 reflectAcrossYaxis() {
+	return S(-1, 1);
+}
+
+glm::mat3 reflectAcrossOrigin() {
+	return S(-1, -1);
+}
+
+glm::mat3 scale2XAboutPoint(float x, float y) {
+	return T(x, y)*S(2, 2)*T(-x, -y);
+}
+
+glm::mat3 reflectAcrossLineYeqXplus50() {
+	return T(0, 50)*R(-45)*reflectAcrossYaxis()*R(45)*T(0, -50);
+}
+
+glm::mat3 rotateAroundOwnAxisAndAroundOrigin(
+	float distFromOrigin,
+	float angleAboutOwnAxis,
+	float angleAboutOrigin) {
+	return R(angleAboutOrigin)*T(distFromOrigin,0)*R(angleAboutOwnAxis);
+}
+
+
 
 /**
 * @fn	glm::mat4 T(float dx, float dy, float dz)
